@@ -491,7 +491,7 @@ function NFTicketComponent(props) {
     },
   ];
 
-  let provider = new ethers.providers.Web3Provider(window.ethereum);
+  let provider = new ethers.providers.Web3Provider((window as any).ethereum);
   let smartContractInstance = new ethers.Contract(
     smartContractAddress,
     smartContractAbi,
@@ -547,13 +547,13 @@ function NFTicketComponent(props) {
     <div>
       <div>
         <div>
-          <h2>NFTicketComponent</h2>
+          <h2 style={{ textAlign: "center" }}>NFTicketComponent</h2>
         </div>
 
         <div style={{ paddingTop: "1rem" }}>
           <input
             type="number"
-            onChange={(e) => setQuantityToMint(e.target.value)}
+            onChange={(e: any) => setQuantityToMint(e.target.value)}
           ></input>
           <IonButton onClick={mintNftFunc}>mintNftButton</IonButton>
         </div>

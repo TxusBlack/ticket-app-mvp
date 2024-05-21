@@ -12,6 +12,7 @@ import { ThirdwebProvider } from "thirdweb/react";
 import Web2InfraComponent from "../components/web3/Web2InfraComponent";
 import Web3Signature from "../components/web3/Web3Signature";
 import Web2SignatureComponent from "../components/web3/Web2SignatureComponent";
+import BackComponent from "../components/web3/BackComponent";
 
 const Home: React.FC = () => {
   return (
@@ -51,6 +52,18 @@ const Home: React.FC = () => {
                 <ThirdwebProvider>
                   <Web2SignatureComponent />
                 </ThirdwebProvider>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ paddingTop: "35px" }}>
+            <div>
+              <h1 style={{ color: "red" }}>
+                ////////////////////////////---//BACK///---////////////////////////////
+              </h1>
+
+              <div>
+                <BackComponent />
               </div>
             </div>
           </div>

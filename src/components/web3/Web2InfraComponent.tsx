@@ -21,6 +21,7 @@ interface ContainerProps {}
 const Web2InfraComponent: React.FC<ContainerProps> = (props: any) => {
   const [userConnected, setUserConnected] = useState(false);
   const [mintedNfts, setMintedNfts] = useState(0);
+  const [userMintedNfts, setUserMintedNfts] = useState(0);
 
   const clientId = "193451e5ca239a3cb30a2c548f8bf08c";
   const amoyChain = defineChain(polygonAmoy);
@@ -30,10 +31,10 @@ const Web2InfraComponent: React.FC<ContainerProps> = (props: any) => {
     clientId: "193451e5ca239a3cb30a2c548f8bf08c",
   });
 
-  const account = useActiveAccount();
+  const account: any = useActiveAccount();
 
   const { disconnect } = useDisconnect();
-  const wallet = useActiveWallet();
+  const wallet: any = useActiveWallet();
 
   let smartContractAbi = [
     {
@@ -534,7 +535,6 @@ const Web2InfraComponent: React.FC<ContainerProps> = (props: any) => {
   }
 
   async function mintNft() {
-    console.log("1");
     const tx = prepareContractCall({
       contract: contract,
       // Pass the method signature that you want to call
@@ -542,15 +542,10 @@ const Web2InfraComponent: React.FC<ContainerProps> = (props: any) => {
         "function mintNFTicket(address paramAddressToMint, uint256 paramQuantityToMint)",
       // and the params for that method
       // Their types are automatically inferred based on the method signature
-      params: ["0x83fb10ACbf92C4091744ECE4F314fCd5f5296Dc7", 1],
+      params: [account.address, 1],
     });
 
     console.log(tx);
-
-    console.log("2");
-
-    // console.log("- account: ", account);
-    // console.log("- address: ", account.address);+
 
     let accountForTx = account;
 
@@ -564,18 +559,6 @@ const Web2InfraComponent: React.FC<ContainerProps> = (props: any) => {
     const transactionResult = await sendTransaction(txOptions);
     console.log("TX RESULT");
     console.log(transactionResult);
-
-    // let signedTx = await account.signTransaction;
-    // let hash = await account.sendTransaction(tx);
-
-    // const transactionResult = await sendTransaction({
-    //     account,
-    //     tx,
-    //   });
-    // console.log(transactionResult);
-
-    console.log("3");
-    // const receipt = await waitForReceipt(transactionResult);
 
     alert("MINTED", transactionResult.transactionHash);
     console.log("MINTED NFT");
@@ -613,12 +596,19 @@ const Web2InfraComponent: React.FC<ContainerProps> = (props: any) => {
     // console.log(signature);
     console.log("NONFUNGIBLE");
 
-    let _mintedNfts = await readContract({
+    let _mintedNfts: any = await readContract({
       contract: contract,
       method: "function totalSupply() view returns (uint256)",
       params: [],
     });
     setMintedNfts(_mintedNfts.toString());
+
+    let _userMintedNfts: any = await readContract({
+      contract: contract,
+      method: "function balanceOf(address owner) view returns (uint256)",
+      params: [account.address],
+    });
+    setUserMintedNfts(_userMintedNfts.toString());
 
     console.log("MINTED NFTS");
     console.log(mintedNfts);
@@ -626,12 +616,12 @@ const Web2InfraComponent: React.FC<ContainerProps> = (props: any) => {
 
   function Disconnect() {
     const { disconnect } = useDisconnect();
-    const wallet = useActiveWallet();
+    const wallet: any = useActiveWallet();
 
     disconnect(wallet);
   }
 
-  // getUserData();
+  getUserData();
 
   return (
     <div>
@@ -654,6 +644,7 @@ const Web2InfraComponent: React.FC<ContainerProps> = (props: any) => {
               </div>
               <div>
                 <h3>Actual NFTickets sold: {mintedNfts}</h3>
+                <h3>User mintedNfts: {userMintedNfts} </h3>
               </div>
               <div>
                 <h2>MINT NFT:</h2>

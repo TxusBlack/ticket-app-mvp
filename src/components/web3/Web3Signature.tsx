@@ -358,10 +358,7 @@ function Web3Signature(props: any) {
     },
   ];
 
-  const provider =
-    (window as any).ethereum != null
-      ? new ethers.providers.Web3Provider((window as any).ethereum)
-      : ethers.providers.getDefaultProvider();
+  let provider = new ethers.providers.Web3Provider((window as any).ethereum);
 
   let smartContractInstance = new ethers.Contract(
     smartContractAddress,
@@ -378,7 +375,7 @@ function Web3Signature(props: any) {
         method: "eth_requestAccounts",
       });
 
-      const _signer = await (provider as any).getSigner();
+      const _signer: any = await provider.getSigner();
       const _address = accounts[0];
 
       setAddress(_address);
@@ -400,10 +397,9 @@ function Web3Signature(props: any) {
     let hash = await smartContractInstance.getHashToSignForUser(address);
     console.log("User hash:");
     console.log(hash);
+    console.log(ethers.utils.arrayify(hash));
 
-    let signature = await (signer as any).signMessage(
-      ethers.utils.arrayify(hash)
-    );
+    let signature = await (signer as any).signMessage(ethers.utils.arrayify(hash));
     console.log("signature");
     console.log(signature);
 

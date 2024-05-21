@@ -3,7 +3,12 @@ import { useState } from "react";
 import { ConnectButton } from "thirdweb/react";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { polygonAmoy } from "thirdweb/chains";
-import { createThirdwebClient, defineChain } from "thirdweb";
+import {
+  createThirdwebClient,
+  defineChain,
+  hexToBytes,
+  hexToUint8Array,
+} from "thirdweb";
 
 import { useActiveAccount } from "thirdweb/react";
 import { getUserEmail } from "thirdweb/wallets/in-app";
@@ -14,7 +19,6 @@ import { useDisconnect, useActiveWallet } from "thirdweb/react";
 import { getContract, prepareContractCall } from "thirdweb";
 import { readContract } from "thirdweb";
 import { sendTransaction, waitForReceipt } from "thirdweb";
-import { __esModule } from "@testing-library/jest-dom/dist/matchers";
 import { IonButton } from "@ionic/react";
 
 function Web2SignatureComponent(props) {
@@ -29,7 +33,7 @@ function Web2SignatureComponent(props) {
     clientId: "193451e5ca239a3cb30a2c548f8bf08c",
   });
 
-  const account = useActiveAccount();
+  const account: any = useActiveAccount();
 
   const { disconnect } = useDisconnect();
   const wallet = useActiveWallet();
@@ -401,6 +405,17 @@ function Web2SignatureComponent(props) {
   }
 
   async function signNFTicketHash() {
+    // let hash = await readContract({contract: contract, method: "function getHashToSignForUser(address userAddress) view returns(bytes32)", params: [address],});
+    // const bytesHash = hexToUint8Array(hash);
+    // console.log("bytesHash");
+    // console.log(bytesHash);
+
+    // let _signature = await account.signTypedData(message: bytesHash);
+    // console.log("SIG");
+    // console.log(_signature);
+
+    // setSignature(_signature);
+
     let address = account.address;
     let chain = amoyChain;
     let client = clientObject;
@@ -411,14 +426,40 @@ function Web2SignatureComponent(props) {
         "function getHashToSignForUser(address userAddress) view returns(bytes32)",
       params: [address],
     });
-    let _signature = await account.signMessage({ message: hash });
-    setSignature(_signature);
+    // let formatHash = await readContract({contract: contract, method: "function getEthSignedMessageHash(bytes32 _messageHash) pure returns (bytes32)", params: [hash],});
 
-    console.log("NFT HASH SIGNATURE:");
+    console.log("scHash");
+    console.log(hash);
+
+    // let _signature = signKeyRequest({ account: account, hash });
+    // let eip712Data = getKeyRequestData(hash);
+    // let _signature = signKeyRequest({account: account, message: eip712Data});
+    // let _signature = await account.signMessage({message: formatHash});
+
+    // const bytes = hexToBytes("0x1a4");
+
+    const bytesHash = hexToUint8Array(hash);
+    const bytesHashTwo = hexToBytes(hash);
+    console.log("bytesHash");
+    console.log(bytesHash);
+
+    // let _signature = await account.signMessage(bytesHash);
+    // let _signature = await account.signMessage({message: hexToBytes(hash)});
+    let _signature = await account.signMessage({
+      message: { raw: hexToBytes(hash) },
+    });
+
+    console.log("SIG");
     console.log(_signature);
 
-    console.log("STATE HASH:");
-    console.log(signature);
+    // let _signature = await account.inAppWallet.sign(hash);
+    setSignature(_signature);
+
+    // console.log("NFT HASH SIGNATURE:");
+    // console.log(_signature);
+
+    // console.log("STATE HASH:");
+    // console.log(signature);
   }
 
   // async function getUserData()
@@ -459,7 +500,7 @@ function Web2SignatureComponent(props) {
 
   function Disconnect() {
     const { disconnect } = useDisconnect();
-    const wallet = useActiveWallet();
+    const wallet: any = useActiveWallet();
 
     disconnect(wallet);
   }
@@ -485,6 +526,7 @@ function Web2SignatureComponent(props) {
               {/* <div>
                                 <IonButton onClick={getUserData}>getData</IonButton>
                             </div> */}
+              {/* <iframe src="https://embedded-wallet.thirdweb.com/sdk/2022-08-12/embedded-wallet/export?clientId=193451e5ca239a3cb30a2c548f8bf08c" allow="clipboard-read; clipboard-write"/> */}
               <div>
                 <h3>SIGNATURE: {signature}</h3>
               </div>
@@ -493,9 +535,7 @@ function Web2SignatureComponent(props) {
                 <IonButton onClick={signNFTicketHash}>sign</IonButton>
               </div>
               <div style={{ paddingTop: "45px" }}>
-                <IonButton onClick={() => disconnect(wallet)}>
-                  Disconnect
-                </IonButton>
+                <IonButton onClick={() => disconnect(wallet)}>Disconnect</IonButton>
               </div>
             </div>
           </>

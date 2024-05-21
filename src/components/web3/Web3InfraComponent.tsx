@@ -9,10 +9,7 @@ function Web3InfraComponent(props: any) {
   const [address, setAddress] = useState(null);
   const [signer, setSigner] = useState(null);
 
-  const provider =
-    (window as any).ethereum != null
-      ? new (ethers as any).providers.Web3Provider((window as any).ethereum)
-      : (ethers as any).providers.getDefaultProvider();
+  let provider = new ethers.providers.Web3Provider((window as any).ethereum);
 
   async function requestAccount() {
     if ((window as any).ethereum) {
@@ -21,7 +18,7 @@ function Web3InfraComponent(props: any) {
         method: "eth_requestAccounts",
       });
 
-      const _signer = await provider.getSigner();
+      const _signer: any = await provider.getSigner();
       const _address = accounts[0];
 
       setAddress(_address);
