@@ -4,8 +4,8 @@ import { IonButton } from "@ionic/react";
 
 // import BorderWrapper from 'react-border-wrapper';
 
-function NFTicketComponent(props) {
-  const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+function NFTicketComponent(props: any) {
+  const delay = (ms: any) => new Promise((res) => setTimeout(res, ms));
 
   let userAddress = props.addressData;
   let signer = props.signerData;
@@ -491,7 +491,10 @@ function NFTicketComponent(props) {
     },
   ];
 
-  let provider = new ethers.providers.Web3Provider((window as any).ethereum);
+  const provider =
+    (window as any).ethereum != null
+      ? new (ethers as any).providers.Web3Provider((window as any).ethereum)
+      : (ethers as any).providers.getDefaultProvider();
   let smartContractInstance = new ethers.Contract(
     smartContractAddress,
     smartContractAbi,

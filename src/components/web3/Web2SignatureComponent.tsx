@@ -21,7 +21,7 @@ import { readContract } from "thirdweb";
 import { sendTransaction, waitForReceipt } from "thirdweb";
 import { IonButton } from "@ionic/react";
 
-function Web2SignatureComponent(props) {
+function Web2SignatureComponent(props: any) {
   const [userConnected, setUserConnected] = useState(false);
   const [signature, setSignature] = useState(null);
 
@@ -36,7 +36,7 @@ function Web2SignatureComponent(props) {
   const account: any = useActiveAccount();
 
   const { disconnect } = useDisconnect();
-  const wallet = useActiveWallet();
+  const wallet: any = useActiveWallet();
 
   let smartContractAbi = [
     {

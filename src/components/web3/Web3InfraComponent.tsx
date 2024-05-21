@@ -9,7 +9,10 @@ function Web3InfraComponent(props: any) {
   const [address, setAddress] = useState(null);
   const [signer, setSigner] = useState(null);
 
-  let provider = new ethers.providers.Web3Provider((window as any).ethereum);
+  const provider =
+    (window as any).ethereum != null
+      ? new (ethers as any).providers.Web3Provider((window as any).ethereum)
+      : (ethers as any).providers.getDefaultProvider();
 
   async function requestAccount() {
     if ((window as any).ethereum) {

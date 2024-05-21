@@ -560,7 +560,8 @@ const Web2InfraComponent: React.FC<ContainerProps> = (props: any) => {
     console.log("TX RESULT");
     console.log(transactionResult);
 
-    alert("MINTED", transactionResult.transactionHash);
+    // alert("MINTED", transactionResult.transactionHash);
+    alert("MINTED");
     console.log("MINTED NFT");
     // console.log(receipt);
 

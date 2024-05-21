@@ -358,7 +358,10 @@ function Web3Signature(props: any) {
     },
   ];
 
-  let provider = new ethers.providers.Web3Provider((window as any).ethereum);
+  const provider =
+    (window as any).ethereum != null
+      ? new (ethers as any).providers.Web3Provider((window as any).ethereum)
+      : (ethers as any).providers.getDefaultProvider();
 
   let smartContractInstance = new ethers.Contract(
     smartContractAddress,

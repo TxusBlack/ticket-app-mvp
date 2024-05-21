@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ethers } from "ethers";
 import { IonButton } from "@ionic/react";
 
-function BackComponent(props) {
+function BackComponent(props: any) {
   let smartContractAddress = "0x39978200DF7Ff5C64E8d8E2CB3F2314226A0D557";
   let smartContractAbi = [
     {
