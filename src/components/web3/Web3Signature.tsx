@@ -3,6 +3,7 @@
 import { IonButton } from "@ionic/react";
 import { ethers } from "ethers";
 import { useState } from "react";
+import QRCode from "react-qr-code";
 
 function Web3Signature(props: any) {
   const [userConnected, setUserConnected] = useState(false);
@@ -402,7 +403,9 @@ function Web3Signature(props: any) {
     console.log(hash);
     console.log(ethers.utils.arrayify(hash));
 
-    let signature = await (signer as any).signMessage(ethers.utils.arrayify(hash));
+    let signature = await (signer as any).signMessage(
+      ethers.utils.arrayify(hash)
+    );
     console.log("signature");
     console.log(signature);
 
@@ -429,6 +432,7 @@ function Web3Signature(props: any) {
 
               <div style={{ paddingTop: "15px" }}>
                 <h2>SIGNATURE: {signature}</h2>
+                {signature && <QRCode value={signature} />}
               </div>
 
               <div>

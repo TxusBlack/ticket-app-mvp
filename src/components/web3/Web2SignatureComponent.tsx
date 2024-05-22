@@ -20,6 +20,7 @@ import { getContract, prepareContractCall } from "thirdweb";
 import { readContract } from "thirdweb";
 import { sendTransaction, waitForReceipt } from "thirdweb";
 import { IonButton } from "@ionic/react";
+import QRCode from "react-qr-code";
 
 function Web2SignatureComponent(props: any) {
   const [userConnected, setUserConnected] = useState(false);
@@ -516,7 +517,14 @@ function Web2SignatureComponent(props: any) {
       <div style={{ display: "flex", justifyContent: "center" }}>
         {account ? (
           <>
-            <div style={{ paddingTop: "1rem" }}>
+            <div
+              style={{
+                paddingTop: "1rem",
+                display: "flex",
+                flexDirection: "column",
+                width: "100%",
+              }}
+            >
               <ConnectButton
                 client={clientObject}
                 chain={amoyChain}
@@ -529,13 +537,16 @@ function Web2SignatureComponent(props: any) {
               {/* <iframe src="https://embedded-wallet.thirdweb.com/sdk/2022-08-12/embedded-wallet/export?clientId=193451e5ca239a3cb30a2c548f8bf08c" allow="clipboard-read; clipboard-write"/> */}
               <div>
                 <h3>SIGNATURE: {signature}</h3>
+                {signature && <QRCode value={signature} />}
               </div>
               <div>
                 <h2>Sign NFTicketHash:</h2>
                 <IonButton onClick={signNFTicketHash}>sign</IonButton>
               </div>
               <div style={{ paddingTop: "45px" }}>
-                <IonButton onClick={() => disconnect(wallet)}>Disconnect</IonButton>
+                <IonButton onClick={() => disconnect(wallet)}>
+                  Disconnect
+                </IonButton>
               </div>
             </div>
           </>
