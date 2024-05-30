@@ -19,12 +19,18 @@ import { useDisconnect, useActiveWallet } from "thirdweb/react";
 import { getContract, prepareContractCall } from "thirdweb";
 import { readContract } from "thirdweb";
 import { sendTransaction, waitForReceipt } from "thirdweb";
-import { IonButton } from "@ionic/react";
+import { IonButton, IonItem, IonLabel } from "@ionic/react";
 import QRCode from "react-qr-code";
+import {
+  Barcode,
+  BarcodeFormat,
+  BarcodeScanner,
+} from "@capacitor-mlkit/barcode-scanning";
 
 function Web2SignatureComponent(props: any) {
   const [userConnected, setUserConnected] = useState(false);
   const [signature, setSignature] = useState(null);
+  const [signatureQR, setSignatureQR] = useState("");
 
   const clientId = "193451e5ca239a3cb30a2c548f8bf08c";
   const amoyChain = defineChain(polygonAmoy);
@@ -506,6 +512,35 @@ function Web2SignatureComponent(props: any) {
     disconnect(wallet);
   }
 
+  const requestPermissions = async () => {
+    const { camera } = await BarcodeScanner.requestPermissions();
+    return camera === "granted" || camera === "limited";
+  };
+
+  const scan = async () => {
+    try {
+      const granted = await requestPermissions();
+      if (!granted) {
+        alert("Permiso de cámara denegado");
+        return;
+      }
+      const ress = await BarcodeScanner.isGoogleBarcodeScannerModuleAvailable();
+      console.log(ress);
+      if (!ress.available) {
+        await BarcodeScanner.installGoogleBarcodeScannerModule();
+      }
+      const { barcodes } = await BarcodeScanner.scan({
+        formats: [BarcodeFormat.QrCode],
+      });
+      console.log(barcodes);
+      alert(barcodes[0].displayValue);
+      setSignatureQR(barcodes[0].displayValue);
+      return barcodes;
+    } catch (err) {
+      alert(err);
+    }
+  };
+
   // getUserData();
 
   return (
@@ -535,10 +570,22 @@ function Web2SignatureComponent(props: any) {
                                 <IonButton onClick={getUserData}>getData</IonButton>
                             </div> */}
               {/* <iframe src="https://embedded-wallet.thirdweb.com/sdk/2022-08-12/embedded-wallet/export?clientId=193451e5ca239a3cb30a2c548f8bf08c" allow="clipboard-read; clipboard-write"/> */}
-              <div>
+              <div style={{ display: 'flex', flexDirection: 'column', paddingTop: "15px" }}>
                 <h3>SIGNATURE: {signature}</h3>
                 {signature && <QRCode value={signature} />}
               </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }} className="item-text-wrap">
+              <h3>SCANNER QR:</h3>
+              <div style={{ width: '100vw' }}>
+                <IonItem>
+                  <IonLabel text-wrap>
+                    {signatureQR}
+                  </IonLabel>
+                </IonItem>
+              </div>
+              {signature && <QRCode value={signature} />}
+              <IonButton onClick={scan}>Escanear QR</IonButton>
+            </div>
               <div>
                 <h2>Sign NFTicketHash:</h2>
                 <IonButton onClick={signNFTicketHash}>sign</IonButton>
@@ -551,13 +598,25 @@ function Web2SignatureComponent(props: any) {
             </div>
           </>
         ) : (
-          <>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
             <ConnectButton
               client={clientObject}
               chain={amoyChain}
               onClick={connect}
             />
-          </>
+            {/* <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }} className="item-text-wrap">
+              <h3>SCANNER QR:</h3>
+              <div style={{ width: '100vw' }}>
+                <IonItem>
+                  <IonLabel text-wrap>
+                    {signatureQR}
+                  </IonLabel>
+                </IonItem>
+              </div>
+              {signature && <QRCode value={signature} />}
+              <IonButton onClick={scan}>Escanear QR</IonButton>
+            </div> */}
+          </div>
         )}
       </div>
     </div>

@@ -1,6 +1,7 @@
 // 0x39978200DF7Ff5C64E8d8E2CB3F2314226A0D557
 
-import { IonButton } from "@ionic/react";
+import { Barcode, BarcodeFormat, BarcodeScanner } from "@capacitor-mlkit/barcode-scanning";
+import { IonButton, IonItem, IonLabel } from "@ionic/react";
 import { ethers } from "ethers";
 import { useState } from "react";
 import QRCode from "react-qr-code";
@@ -371,6 +372,7 @@ function Web3Signature(props: any) {
   );
 
   const [signature, setSignature] = useState(null);
+  const [signatureQR, setSignatureQR] = useState("");
 
   async function requestAccount() {
     if ((window as any).ethereum) {
@@ -412,10 +414,40 @@ function Web3Signature(props: any) {
     setSignature(signature);
   }
 
+  const requestPermissions = async () => {
+    const { camera } = await BarcodeScanner.requestPermissions();
+    return camera === "granted" || camera === "limited";
+  };
+
+  const scan = async () => {
+    try {
+      const granted = await requestPermissions();
+      if (!granted) {
+        alert("Permiso de cámara denegado");
+        return;
+      }
+      const ress = await BarcodeScanner.isGoogleBarcodeScannerModuleAvailable();
+      console.log(ress);
+      if (!ress.available) {
+        await BarcodeScanner.installGoogleBarcodeScannerModule();
+      }
+      const { barcodes } = await BarcodeScanner.scan({
+        formats: [BarcodeFormat.QrCode],
+      });
+      console.log(barcodes);
+      alert(barcodes[0].displayValue);
+      setSignatureQR(barcodes[0].displayValue);
+      return barcodes;
+    } catch (err) {
+      alert(err);
+    }
+  };
+
   return (
     <div>
       <div>
         <h2 style={{ textAlign: "center" }}>//WEB3SIGNATURE COMPONENT///</h2>
+        {/* <IonButton onClick={scan}>Escanear QR</IonButton> */}
       </div>
 
       <div style={{ display: "flex", justifyContent: "center" }}>
@@ -430,9 +462,22 @@ function Web3Signature(props: any) {
             >
               <h3>addressConnected: {address}</h3>
 
-              <div style={{ paddingTop: "15px" }}>
+              <div style={{ display: 'flex', flexDirection: 'column', paddingTop: "15px" }}>
                 <h2>SIGNATURE: {signature}</h2>
                 {signature && <QRCode value={signature} />}
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }} className="item-text-wrap">
+                <h3>SCANNER QR:</h3>
+                <div style={{ width: '100vw' }}>
+                  <IonItem>
+                    <IonLabel text-wrap>
+                      {signatureQR}
+                    </IonLabel>
+                  </IonItem>
+                </div>
+                {signature && <QRCode value={signature} />}
+                <IonButton onClick={scan}>Escanear QR</IonButton>
               </div>
 
               <div>
