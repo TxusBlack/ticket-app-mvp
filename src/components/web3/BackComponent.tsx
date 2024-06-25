@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { IonButton } from "@ionic/react";
+import { SignatureQrContext } from "../../context/SignatureQrContexts";
 
 function BackComponent(props: any) {
   let smartContractAddress = "0x39978200DF7Ff5C64E8d8E2CB3F2314226A0D557";
@@ -362,9 +363,19 @@ function BackComponent(props: any) {
   );
 
   const [whitelistCheckersInput, setWhitelistCheckersInput] = useState(null);
-  const [sigParam, setSigParam] = useState(null);
-  const [userAddressToValidate, setUserAddressToValidate] = useState(null);
+  // const [sigParam, setSigParam] = useState("");
+  // const [userAddressToValidate, setUserAddressToValidate] = useState(null);
   const [numberOfNftickets, setNumberOfNftickets] = useState(null);
+  const {
+    signatureQr,
+    setSignatureQr,
+    userAddressToValidate,
+    setSmartContractAddress,
+    setProvider,
+    setUserAddressToValidate,
+    setSmartContractInstance,
+    validateNFTicketFunc,
+  } = useContext(SignatureQrContext);
 
   async function whitelistCheckersFunc() {
     // console.log(whitelistCheckersInput);
@@ -381,115 +392,122 @@ function BackComponent(props: any) {
     alert(availableNftickets);
   }
 
-  async function validateNFTicketFunc() {
-    // let mnemonic = "shy neither deputy offer draw plunge exercise fatigue devote pulse rich blind";
-    // let wallet = ethers.Wallet.fromMnemonic(mnemonic)
-    let privateKey =
-      "d429bcdf42aefdbb1aa00f86b0d4b6eef8e9616cd1004d9b22d88df34381f415";
-    const wallet = new ethers.Wallet(privateKey);
+  useEffect(() => {
+    setSmartContractAddress(smartContractAddress);
+    setProvider(provider);
+    setUserAddressToValidate(userAddressToValidate);
+    setSmartContractInstance(smartContractInstance);
+  }, []);
 
-    console.log(wallet);
+  // async function validateNFTicketFunc() {
+  //   // let mnemonic = "shy neither deputy offer draw plunge exercise fatigue devote pulse rich blind";
+  //   // let wallet = ethers.Wallet.fromMnemonic(mnemonic)
+  //   let privateKey =
+  //     "d429bcdf42aefdbb1aa00f86b0d4b6eef8e9616cd1004d9b22d88df34381f415";
+  //   const wallet = new ethers.Wallet(privateKey);
 
-    console.log("WALLET DATA:");
-    console.log(wallet);
-    console.log(wallet.address);
+  //   console.log(wallet);
 
-    let fromAddress = wallet.address;
-    let toAddress = smartContractAddress;
-    let nonce = await provider.getTransactionCount(fromAddress, "latest");
-    let gasPrice = await provider.getFeeData();
-    let gasLimit = 25000000;
-    let chainId = 80002;
-    let abi = [
-      "function validateAllNFTickets(address userAddress, bytes memory signature)",
-    ];
-    let iface = new ethers.utils.Interface(abi);
-    let data = iface.encodeFunctionData("validateAllNFTickets", [
-      userAddressToValidate,
-      sigParam,
-    ]);
+  //   console.log("WALLET DATA:");
+  //   console.log(wallet);
+  //   console.log(wallet.address);
 
-    const tx: any = {
-      nonce: nonce,
-      gasPrice: gasPrice.gasPrice,
-      gasLimit: gasLimit,
-      // EIP-1559 fields
-      // maxFeePerGas: gasPrice.maxFeePerGas,
-      // maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
-      to: toAddress,
-      value: 0,
-      data: data,
-      chainId: chainId,
-      // EIP-2718
-      // type: 0
-    };
+  //   let fromAddress = wallet.address;
+  //   let toAddress = smartContractAddress;
+  //   let nonce = await provider.getTransactionCount(fromAddress, "latest");
+  //   let gasPrice = await provider.getFeeData();
+  //   let gasLimit = 25000000;
+  //   let chainId = 80002;
+  //   let abi = [
+  //     "function validateAllNFTickets(address userAddress, bytes memory signature)",
+  //   ];
+  //   let iface = new ethers.utils.Interface(abi);
+  //   let data = iface.encodeFunctionData("validateAllNFTickets", [
+  //     userAddressToValidate,
+  //     sigParam,
+  //   ]);
 
-    console.log("TX");
-    console.log(tx);
+  //   const tx: any = {
+  //     nonce: nonce,
+  //     gasPrice: gasPrice.gasPrice,
+  //     gasLimit: gasLimit,
+  //     // EIP-1559 fields
+  //     // maxFeePerGas: gasPrice.maxFeePerGas,
+  //     // maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
+  //     to: toAddress,
+  //     value: 0,
+  //     data: data,
+  //     chainId: chainId,
+  //     // EIP-2718
+  //     // type: 0
+  //   };
 
-    let promiseTx = await wallet.signTransaction(tx);
-    console.log("PROMISE TX");
-    console.log(promiseTx);
+  //   console.log("TX");
+  //   console.log(tx);
 
-    let submittedTx = await provider.sendTransaction(promiseTx);
-    console.log("SUBMITTED TX");
-    console.log(submittedTx);
+  //   let promiseTx = await wallet.signTransaction(tx);
+  //   console.log("PROMISE TX");
+  //   console.log(promiseTx);
 
-    const txReceipt = await submittedTx.wait(1);
-    console.log("TX RECEIPT");
-    console.log(txReceipt);
+  //   let submittedTx = await provider.sendTransaction(promiseTx);
+  //   console.log("SUBMITTED TX");
+  //   console.log(submittedTx);
 
-    let txBlock = txReceipt.blockNumber;
-    const events: any = await smartContractInstance.queryFilter(
-      "totalNFTicketUsedInTxEvent",
-      txBlock,
-      txBlock
-    );
+  //   const txReceipt = await submittedTx.wait(1);
+  //   console.log("TX RECEIPT");
+  //   console.log(txReceipt);
 
-    console.log("txEvents:");
-    console.log("Events length: ", events.length);
-    console.log(events);
+  //   let txBlock = txReceipt.blockNumber;
+  //   const events: any = await smartContractInstance.queryFilter(
+  //     "totalNFTicketUsedInTxEvent",
+  //     txBlock,
+  //     txBlock
+  //   );
 
-    console.log(events[0].event);
-    console.log(events[0].args);
+  //   console.log("txEvents:");
+  //   console.log("Events length: ", events.length);
+  //   console.log(events);
 
-    console.log(events[0].args[0]);
-    console.log(events[0].args[1]);
-    console.log(events[0].args[2]);
-    console.log(events[0].args[3].toString());
+  //   console.log(events[0].event);
+  //   console.log(events[0].args);
 
-    // let args = events[0].args;
-    // let msg = args[0];
-    // let buyer = args[1];
-    // let nfticketId = args[2];
+  //   console.log(events[0].args[0]);
+  //   console.log(events[0].args[1]);
+  //   console.log(events[0].args[2]);
+  //   console.log(events[0].args[3].toString());
 
-    // console.log("ARGS");
-    // console.log(args);
+  //   // let args = events[0].args;
+  //   // let msg = args[0];
+  //   // let buyer = args[1];
+  //   // let nfticketId = args[2];
 
-    // console.log("MSG: ", msg);
-    // console.log("BUYER: ", buyer);
-    // // console.log(buyer);
+  //   // console.log("ARGS");
+  //   // console.log(args);
 
-    // // console.log(msg);
-    // console.log("NFTICKET ID: ", nfticketId.toString());
-    // // console.log(nfticketId);
+  //   // console.log("MSG: ", msg);
+  //   // console.log("BUYER: ", buyer);
+  //   // // console.log(buyer);
 
-    alert(
-      events[0].args[0] +
-        "\n" +
-        " " +
-        "\n" +
-        `Validator: ${events[0].args[1]}` +
-        "\n" +
-        " " +
-        "\n" +
-        `NFTs validated for user: ${events[0].args[2]}` +
-        "\n" +
-        " " +
-        "\n" +
-        `NFTicketBoughtQuantity: ${events[0].args[3].toString()}`
-    );
-  }
+  //   // // console.log(msg);
+  //   // console.log("NFTICKET ID: ", nfticketId.toString());
+  //   // // console.log(nfticketId);
+
+  //   alert(
+  //     events[0].args[0] +
+  //       "\n" +
+  //       " " +
+  //       "\n" +
+  //       `Validator: ${events[0].args[1]}` +
+  //       "\n" +
+  //       " " +
+  //       "\n" +
+  //       `NFTs validated for user: ${events[0].args[2]}` +
+  //       "\n" +
+  //       " " +
+  //       "\n" +
+  //       `NFTicketBoughtQuantity: ${events[0].args[3].toString()}`
+  //   );
+  // }
 
   async function validateNumberOfNFTicketFunc() {
     // let mnemonic = "shy neither deputy offer draw plunge exercise fatigue devote pulse rich blind";
@@ -516,7 +534,8 @@ function BackComponent(props: any) {
     let iface = new ethers.utils.Interface(abi);
     let data = iface.encodeFunctionData("validateNFTickets", [
       userAddressToValidate,
-      sigParam,
+      // sigParam,
+      signatureQr,
       numberOfNftickets,
     ]);
 
@@ -634,7 +653,9 @@ function BackComponent(props: any) {
 
         <div style={{ paddingTop: "2rem" }}>
           <h3>validateAllNFTickets of a user:</h3>
-          <IonButton onClick={getAvailableNftickets}>getAvailableNftickets</IonButton>
+          <IonButton onClick={getAvailableNftickets}>
+            getAvailableNftickets
+          </IonButton>
           <input
             type="text"
             placeholder="userAddress"
@@ -643,14 +664,17 @@ function BackComponent(props: any) {
           <input
             type="text"
             placeholder="signature"
-            onChange={(e: any) => setSigParam(e.target.value)}
+            onChange={(e: any) => setSignatureQr(e.target.value)}
+            value={signatureQr}
           ></input>
           <IonButton onClick={validateNFTicketFunc}>validateAll</IonButton>
         </div>
 
         <div style={{ paddingTop: "2rem" }}>
           <h3>validate # of NFTickets of a user:</h3>
-          <IonButton onClick={getAvailableNftickets}>getAvailableNftickets</IonButton>
+          <IonButton onClick={getAvailableNftickets}>
+            getAvailableNftickets
+          </IonButton>
           <input
             type="text"
             placeholder="userAddress"
@@ -664,9 +688,12 @@ function BackComponent(props: any) {
           <input
             type="text"
             placeholder="signature"
-            onChange={(e: any) => setSigParam(e.target.value)}
+            onChange={(e: any) => setSignatureQr(e.target.value)}
+            value={signatureQr}
           ></input>
-          <IonButton onClick={validateNumberOfNFTicketFunc}>validateNumber</IonButton>
+          <IonButton onClick={validateNumberOfNFTicketFunc}>
+            validateNumber
+          </IonButton>
         </div>
       </div>
     </div>

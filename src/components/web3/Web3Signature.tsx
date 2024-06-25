@@ -3,13 +3,16 @@
 import { Barcode, BarcodeFormat, BarcodeScanner } from "@capacitor-mlkit/barcode-scanning";
 import { IonButton, IonItem, IonLabel } from "@ionic/react";
 import { ethers } from "ethers";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import QRCode from "react-qr-code";
+import { SignatureQrContext } from "../../context/SignatureQrContexts";
 
 function Web3Signature(props: any) {
   const [userConnected, setUserConnected] = useState(false);
   const [address, setAddress] = useState(null);
   const [signer, setSigner] = useState(null);
+  const [signature, setSignature] = useState(null);
+  const { signatureQr, setSignatureQr } = useContext(SignatureQrContext);
 
   let smartContractAddress = "0x39978200DF7Ff5C64E8d8E2CB3F2314226A0D557";
   let smartContractAbi = [
@@ -371,9 +374,6 @@ function Web3Signature(props: any) {
     provider
   );
 
-  const [signature, setSignature] = useState(null);
-  const [signatureQR, setSignatureQR] = useState("");
-
   async function requestAccount() {
     if ((window as any).ethereum) {
       console.log("METAMASK IS INSTALLED.");
@@ -436,7 +436,7 @@ function Web3Signature(props: any) {
       });
       console.log(barcodes);
       alert(barcodes[0].displayValue);
-      setSignatureQR(barcodes[0].displayValue);
+      setSignatureQr(barcodes[0].displayValue);
       return barcodes;
     } catch (err) {
       alert(err);
@@ -472,7 +472,7 @@ function Web3Signature(props: any) {
                 <div style={{ width: '100vw' }}>
                   <IonItem>
                     <IonLabel text-wrap>
-                      {signatureQR}
+                      {signatureQr}
                     </IonLabel>
                   </IonItem>
                 </div>

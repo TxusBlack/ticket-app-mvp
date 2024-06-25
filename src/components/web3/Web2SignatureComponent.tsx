@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 
 import { ConnectButton } from "thirdweb/react";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
@@ -26,11 +26,12 @@ import {
   BarcodeFormat,
   BarcodeScanner,
 } from "@capacitor-mlkit/barcode-scanning";
+import { SignatureQrContext } from "../../context/SignatureQrContexts";
 
 function Web2SignatureComponent(props: any) {
   const [userConnected, setUserConnected] = useState(false);
-  const [signature, setSignature] = useState(null);
-  const [signatureQR, setSignatureQR] = useState("");
+  const [signature, setSignature] = useState("0x237442b0de789c5c6faf7364b322209c9497dacc58c1e295d82140261115ca0018bdedd8b00832d555394541c166f33a5362b1cba74ba5e6e37e61d03a449e081c");
+  const { signatureQr, setSignatureQr, validateNFTicketFunc } = useContext(SignatureQrContext);
 
   const clientId = "193451e5ca239a3cb30a2c548f8bf08c";
   const amoyChain = defineChain(polygonAmoy);
@@ -534,7 +535,8 @@ function Web2SignatureComponent(props: any) {
       });
       console.log(barcodes);
       alert(barcodes[0].displayValue);
-      setSignatureQR(barcodes[0].displayValue);
+      setSignatureQr(barcodes[0].displayValue);
+      validateNFTicketFunc();
       return barcodes;
     } catch (err) {
       alert(err);
@@ -579,7 +581,7 @@ function Web2SignatureComponent(props: any) {
               <div style={{ width: '100vw' }}>
                 <IonItem>
                   <IonLabel text-wrap>
-                    {signatureQR}
+                    {signatureQr}
                   </IonLabel>
                 </IonItem>
               </div>
@@ -604,18 +606,18 @@ function Web2SignatureComponent(props: any) {
               chain={amoyChain}
               onClick={connect}
             />
-            {/* <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }} className="item-text-wrap">
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }} className="item-text-wrap">
               <h3>SCANNER QR:</h3>
               <div style={{ width: '100vw' }}>
                 <IonItem>
                   <IonLabel text-wrap>
-                    {signatureQR}
+                    {signatureQr}
                   </IonLabel>
                 </IonItem>
               </div>
               {signature && <QRCode value={signature} />}
               <IonButton onClick={scan}>Escanear QR</IonButton>
-            </div> */}
+            </div>
           </div>
         )}
       </div>

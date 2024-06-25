@@ -16,9 +16,7 @@ import { readContract } from "thirdweb";
 import { sendTransaction, waitForReceipt } from "thirdweb";
 import { IonButton } from "@ionic/react";
 
-interface ContainerProps {}
-
-const Web2InfraComponent: React.FC<ContainerProps> = (props: any) => {
+const Web2InfraComponent = (props: any) => {
   const [userConnected, setUserConnected] = useState(false);
   const [mintedNfts, setMintedNfts] = useState(0);
   const [userMintedNfts, setUserMintedNfts] = useState(0);
